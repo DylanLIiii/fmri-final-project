@@ -1,52 +1,50 @@
-Swedish
+Chinese
 
 instructionsSTART
-Din uppgift är att så korrekt och snabbt som möjligt avgöra vilken färg ett ord är skrivet med.
-Du för två alternativ, ett på vardera  sida om det färgade ordet.
-Använd X-tangent för vänster, och M-tangent för höger.
+你的任务是尽可能准确快速地判断一个词语是用什么颜色书写的。你将看到两个选项，分别位于彩色词语的两侧。请使用X键选择左侧选项，使用M键选择右侧选项。
 
 
 
-I exemplet nedan skulle du alltså tryckt på X (vänster), eftersom färgen på mittenordet är grön.
+这个例子中，你应该按 X（左键），因为中间词的颜色是绿色的。
 
 instructionsEND
 
 practiceSTART
-Tryck på MELLANSLAG för att testa 6 omgångar innan själva testet startar.
+测试开始前，请按空格键进行6轮练习。
 practiceEND
 
 testSTART
-Bra jobbat!
+干得好！
 
 
-Har du några frågor så ställ dem till försöksledaren nu.
+如果您有任何问题，请现在向实验负责人提问。
 
 
-Försök att arbeta så snabbt och korrekt som möjligt.
+尽量尽可能快且准确地工作。
 
 
-Tryck MELLANSLAG för att börja det riktiga testet.
+按空格键开始真正的测试。
 testEND
 
 doneSTART
-Nu är experimentet klart,
+实验已完成，
 
 
-Var vänlig meddela testledaren
+请通知测试负责人。
 
 
-Tryck på SPACE för att avsluta programmet.
+按空格键结束程序。
 doneEND
 
 rightSTART
-Rätt!
+正确！
 rightEND
 
 incorrectSTART
-Fel! Det är färgen som gäller inte ordet
+错！重要的是颜色，而不是文字。
 incorrectEND
 
-SwedishEnd
+ChineseEnd
 
 English
 instructionsSTART

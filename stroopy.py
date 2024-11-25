@@ -19,8 +19,10 @@ class Experiment:
     def settings(self):
         experiment_info = {'Subid': '', 'Age': '', 'Experiment Version': 0.1,
                            'Sex': ['Male', 'Female', 'Other'],
-                           'Language': ['English', 'Swedish'], u'date':
-                               data.getDateStr(format="%Y-%m-%d_%H:%M")}
+                           'Language': ['English', 'Chinese'], 
+                            'Total Sessions': 4,  # Total number of sessions
+                            'Current Session': 1,  # Starting session
+                            u'date': data.getDateStr(format="%Y-%m-%d_%H:%M")}
 
         info_dialog = gui.DlgFromDict(title='Stroop task', dictionary=experiment_info,
                                       fixed=['Experiment Version'])
@@ -31,7 +33,28 @@ class Experiment:
         else:
             core.quit()
             return 'Cancelled'
-
+    def manage_sessions(self, settings):
+    # Determine session order and language
+        session_order = [
+            {'language': 'English', 'trial_file': 'practice_list.csv'},
+            {'language': 'English', 'trial_file': 'practice_list.csv'},
+            #{'language': 'Chinese', 'trial_file': 'practice_list.csv'},
+            {'language': 'Chinese', 'trial_file': 'practice_list.csv'}
+        ]
+        
+        # Get current session
+        current_session = settings['Current Session'] - 1
+        
+        if current_session < len(session_order):
+            current_config = session_order[current_session]
+            settings['Language'] = current_config['language']
+            
+            # Advance session
+            settings['Current Session'] += 1
+            
+            return current_config['trial_file']
+        else:
+            return None
     def create_text_stimuli(self, text=None, pos=[0.0, 0.0], name='', color=None):
         '''Creates a text stimulus,
         '''
@@ -40,7 +63,7 @@ class Experiment:
         text_stimuli = visual.TextStim(win=window, ori=0, name=name,
                                        text=text, font=u'Arial',
                                        pos=pos,
-                                       color=color, colorSpace=u'rgb')
+                                       color=color, colorSpace=u'rgb', height=0.05)
         return text_stimuli
 
     def create_trials(self, trial_file, randomization='random'):
@@ -58,7 +81,7 @@ class Experiment:
         _stimulus = stim
         color = color
         position = position
-        if settings['Language'] == "Swedish":
+        if settings['Language'] == "Chinese":
             text = swedish_task(text)
         else:
             text = text
@@ -162,7 +185,7 @@ def display_instructions(start_instruction=''):
         positions = [[-.2, 0], [.2, 0], [0, 0]]
         examples = [experiment.create_text_stimuli() for pos in positions]
         example_words = ['green', 'blue', 'green']
-        if settings['Language'] == 'Swedish':
+        if settings['Language'] == 'Chinese':
             example_words = [swedish_task(word) for word in example_words]
 
         for i, pos in enumerate(positions):
@@ -194,13 +217,13 @@ def display_instructions(start_instruction=''):
 def swedish_task(word):
     swedish = '+'
     if word == "blue":
-        swedish = u"blå"
+        swedish = "蓝色"
     elif word == "red":
-        swedish = u"röd"
+        swedish = "红色"
     elif word == "green":
-        swedish = u"grön"
+        swedish = "绿色"
     elif word == "yellow":
-        swedish = "gul"
+        swedish = "黄色"
     return swedish
 
 
@@ -210,6 +233,9 @@ if __name__ == "__main__":
     textColor = "White"
     # text_color = (1, 1, 1)
     experiment = Experiment(win_color=background , txt_color=textColor)
+    
+    total_sessions_completed = 0
+    
     settings = experiment.settings()
     language = settings['Language']
     instructions = read_instructions_file("INSTRUCTIONS", language, language + "End")
