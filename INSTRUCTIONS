@@ -1,0 +1,96 @@
+Chinese
+
+instructionsSTART
+你的任务是尽可能准确快速地判断一个词语是用什么颜色书写的。你将看到两个选项，分别位于彩色词语的两侧。请使用X键选择左侧选项，使用M键选择右侧选项。
+
+
+
+这个例子中，你应该按 X（左键），因为中间词的颜色是绿色的。
+
+instructionsEND
+
+practiceSTART
+测试开始前，请按空格键进行6轮练习。
+practiceEND
+
+testSTART
+干得好！
+
+
+如果您有任何问题，请现在向实验负责人提问。
+
+
+尽量尽可能快且准确地工作。
+
+
+按空格键开始真正的测试。
+testEND
+
+doneSTART
+实验已完成，
+
+
+请通知测试负责人。
+
+
+按空格键结束程序。
+doneEND
+
+rightSTART
+正确！
+rightEND
+
+incorrectSTART
+错！重要的是颜色，而不是文字。
+incorrectEND
+
+ChineseEnd
+
+English
+instructionsSTART
+Your task is to as accurately and quickly as possible to determine the color of a presented word.
+You get two options, one on each side of the colored word.
+Use the X button if the right option is the left, and the M-key if right option is to the right.
+
+
+
+In the example below, you would then press the X (left), as the word is presented in the color green.
+instructionsEND
+
+practiceSTART
+Press SPACE to test six trials before the start of the actual test.
+practiceEND
+
+testSTART
+Good work!
+
+
+If you have any questions, please ask experimenter leader now.
+
+
+Try to answer as quickly and accurately as possible.
+
+
+Press the SPACE to start the experiment.
+testEND
+
+
+doneSTART
+The experiment is done,
+
+
+Please notify the experimental leader
+
+
+Press space to end the experiment
+doneEND
+
+rightSTART
+Correct!
+rightEND
+
+incorrectSTART
+Incorrect! It is the color not the word
+incorrectEND
+
+EnglishEnd
