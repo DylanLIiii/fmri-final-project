@@ -58,7 +58,7 @@ class Experiment:
                                        pos=pos,
                                        color=color, 
                                        colorSpace=u'rgb', 
-                                       height=0.03, 
+                                       height=0.1, 
                                        wrapWidth=2)
         return text_stimuli
 
