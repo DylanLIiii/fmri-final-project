@@ -18,10 +18,10 @@ class Experiment:
     def settings(self):
         experiment_info = {'Subid': '', 'Age': '', 'Experiment Version': 0.1,
                            'Sex': ['Male', 'Female', 'Other'],
-                           'Language': ['English', 'Chinese'], 
-                            'Total Sessions': 4,  # Total number of sessions
-                            'Current Session': 1,  # Starting session
-                            u'date': data.getDateStr(format="%Y-%m-%d_%H:%M")}
+                           'Language': ['English', 'Chinese'],
+                           'Total Sessions': 4,  # Total number of sessions
+                           'Current Session': 1,  # Starting session
+                           u'date': data.getDateStr(format="%Y-%m-%d_%H:%M")}
 
         info_dialog = gui.DlgFromDict(title='Stroop task', dictionary=experiment_info,
                                       fixed=['Experiment Version'])
@@ -35,14 +35,18 @@ class Experiment:
 
     def manage_sessions(self, settings):
         session_order = [
-            {'language': 'English', 'trial_file': 'practice_list.csv', 'type': 'practice', 'display_name': 'Session 1 English Practice'},
-            {'language': 'English', 'trial_file': 'practice_list.csv', 'type': 'test', 'display_name': 'Session 2 English Test'},
-            {'language': 'Chinese', 'trial_file': 'practice_list.csv', 'type': 'practice', 'display_name': 'Session 3 Chinese Practice'},
-            {'language': 'Chinese', 'trial_file': 'practice_list.csv', 'type': 'test', 'display_name': 'Session 4 Chinese Test'}
+            {'language': 'English', 'trial_file': 'stimuli_list.csv',
+                'type': 'test', 'display_name': 'Session 1 English Test'},
+            {'language': 'English', 'trial_file': 'stimuli_list.csv',
+                'type': 'test', 'display_name': 'Session 2 English Test'},
+            {'language': 'Chinese', 'trial_file': 'stimuli_list.csv',
+                'type': 'test', 'display_name': 'Session 3 Chinese Test'},
+            {'language': 'Chinese', 'trial_file': 'stimuli_list.csv',
+                'type': 'test', 'display_name': 'Session 4 Chinese Test'}
         ]
-        
+
         current_session = settings['Current Session'] - 1
-        
+
         if current_session < len(session_order):
             current_config = session_order[current_session]
             settings['Language'] = current_config['language']
@@ -56,9 +60,9 @@ class Experiment:
         text_stimuli = visual.TextStim(win=window, ori=0, name=name,
                                        text=text, font=u'Songti SC',
                                        pos=pos,
-                                       color=color, 
-                                       colorSpace=u'rgb', 
-                                       height=0.1, 
+                                       color=color,
+                                       colorSpace=u'rgb',
+                                       height=0.1,
                                        wrapWidth=2)
         return text_stimuli
 
@@ -88,6 +92,7 @@ class Experiment:
         _trials = trials
         testtype = testtype
         timer = core.Clock()
+        response_timer = core.Clock()  # 计时器
         stimuli = [self.create_text_stimuli() for _ in range(4)]
 
         for trial in _trials:
@@ -113,46 +118,72 @@ class Experiment:
             alt2.draw()
             window.flip()
 
-            keys = event.waitKeys(keyList=['x', 'm', 'q'])
-            resp_time = timer.getTime()
-            if testtype == 'practice':
-                if keys[0] != trial['correctresponse']:
-                    instruction_stimuli['incorrect'].draw()
-                else:
-                    instruction_stimuli['right'].draw()
-                window.flip()
-                core.wait(2)
+            # 重置响应计时器
+            response_timer.reset()
+            keys = []
+            has_responded = False
+            resp_time = None
 
-            if testtype == 'test':
-                if keys[0] == trial['correctresponse']:
-                    trial['Accuracy'] = 1
-                else:
+            # 持续显示6秒
+            while response_timer.getTime() < 6.0:
+                # 如果还没有响应，继续检查按键
+                if not has_responded:
+                    keys = event.getKeys(keyList=['7', '2', 'q'])
+                    if keys:  # 记录第一次按键
+                        has_responded = True
+                        resp_time = timer.getTime()
+                        # 如果是练习阶段，立即显示反馈
+                        if testtype == 'practice':
+                            if keys[0] != trial['correctresponse']:
+                                instruction_stimuli['incorrect'].draw()
+                            else:
+                                instruction_stimuli['right'].draw()
+                            target.draw()  # 重绘刺激
+                            alt1.draw()
+                            alt2.draw()
+                            window.flip()
+
+            # 6秒后处理数据
+            if not has_responded:  # 如果没有按键（超时）
+                if testtype == 'test':
                     trial['Accuracy'] = 0
+                    trial['RT'] = 6.0
+                    trial['Response'] = 'timeout'
+                    trial['Sub_id'] = settings['Subid']
+                    trial['Sex'] = settings['Sex']
+                    write_csv(settings[u'DataFile'], trial)
+            else:  # 有按键响应
+                if testtype == 'test':
+                    if keys[0] == trial['correctresponse']:
+                        trial['Accuracy'] = 1
+                    else:
+                        trial['Accuracy'] = 0
+                    trial['RT'] = resp_time
+                    trial['Response'] = keys[0]
+                    trial['Sub_id'] = settings['Subid']
+                    trial['Sex'] = settings['Sex']
+                    write_csv(settings[u'DataFile'], trial)
 
-                trial['RT'] = resp_time
-                trial['Response'] = keys[0]
-                trial['Sub_id'] = settings['Subid']
-                trial['Sex'] = settings['Sex']
-                write_csv(settings[u'DataFile'], trial)
+                if 'q' in keys:
+                    return False
 
             event.clearEvents()
-            if 'q' in keys:
-                return False
 
         # 显示session完成信息
         rest_text = f"\n\n{session_config['display_name']} completed.\nPress SPACE to continue."
-        rest_stim = visual.TextStim(window, text=rest_text, height=0.06, color=self.txt_color)
+        rest_stim = visual.TextStim(
+            window, text=rest_text, height=0.1, color=self.txt_color)
         rest_stim.draw()
         window.flip()
-        event.waitKeys(keyList=['space'])
         event.clearEvents()
-        settings['Current Session'] += 1  # 在session完成后增加session计数
-                
+        settings['Current Session'] += 1
+
         return True
 
 
 def create_instructions_dict(instr):
-    start_n_end = [w for w in instr.split() if w.endswith('START') or w.endswith('END')]
+    start_n_end = [w for w in instr.split() if w.endswith('START')
+                   or w.endswith('END')]
     keys = {}
 
     for word in start_n_end:
@@ -208,7 +239,8 @@ def display_instructions(start_instruction=''):
         instruction_stimuli['done'].draw()
 
     window.flip()
-    event.waitKeys(keyList=['space'])
+    event.waitKeys(keyList=['equal'])
+
     event.clearEvents()
 
 
@@ -230,10 +262,11 @@ if __name__ == "__main__":
     back_color = (0, 0, 0)
     textColor = "White"
     experiment = Experiment(win_color=background, txt_color=textColor)
-    
+
     settings = experiment.settings()
     language = settings['Language']
-    instructions = read_instructions_file("INSTRUCTIONS", language, language + "End")
+    instructions = read_instructions_file(
+        "INSTRUCTIONS", language, language + "End")
     instructions_dict = create_instructions_dict(instructions)
     instruction_stimuli = {}
 
@@ -241,34 +274,35 @@ if __name__ == "__main__":
 
     for inst in instructions_dict.keys():
         instruction, START, END = inst, instructions_dict[inst][0], instructions_dict[inst][1]
-        instruction_stimuli[instruction] = create_instructions(instructions, START, END, color=textColor)
+        instruction_stimuli[instruction] = create_instructions(
+            instructions, START, END, color=textColor)
 
     # We don't want the mouse to show:
     event.Mouse(visible=False)
 
     # Show initial instructions
     display_instructions(start_instruction='Practice')
-    
+
     # Main experiment loop
     continue_experiment = True
     while continue_experiment:
         # Get next session configuration
         session_config = experiment.manage_sessions(settings)
-        
+
         if session_config is None:
             # All sessions completed
             break
-            
+
         # Run the session
         trials = experiment.create_trials(session_config['trial_file'])
         continue_experiment = experiment.running_experiment(
-            trials, 
+            trials,
             session_config['type']
         )
-        
+
         if not continue_experiment:
             break  # Exit if experiment was quit
-    
+
     # End experiment but first we display some instructions
     display_instructions(start_instruction='End')
     window.close()
