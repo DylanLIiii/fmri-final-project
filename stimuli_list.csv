@@ -44,6 +44,4 @@ green,green,1,x,green,blue
 green,green,1,m,red,green
 green,green,1,x,green,red
 red,red,1,m,blue,red
-red,red,1,x,red,blue
-red,red,1,m,yellow,red
-red,red,1,x,red,yellow
+
